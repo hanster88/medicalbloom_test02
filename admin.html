@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>관리자 | MEDICAL BLOOM</title>
+<link rel="icon" type="image/png" href="img/favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<link rel="stylesheet" href="css/style.css">
+<style>
+body{background:var(--bg-2)}
+/* ---- login ---- */
+#login-view{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login{width:min(420px,92vw);background:#fff;border:1px solid var(--line);border-radius:24px;padding:52px 44px;box-shadow:var(--shadow);text-align:center}
+.login img{height:52px;margin:0 auto 18px}
+.login h1{font-size:19px;font-weight:700;letter-spacing:.14em;margin-bottom:4px}
+.login .sub{font-size:11px;font-weight:600;letter-spacing:.3em;color:var(--accent-deep);text-transform:uppercase;margin-bottom:34px}
+.login input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font-family:var(--sans);font-size:15px;margin-bottom:12px;transition:.3s}
+.login input:focus{outline:0;border-color:var(--accent);background:#fff}
+.login .btn{width:100%;margin-top:10px}
+.login .err{color:#B4666B;font-size:13px;margin-top:14px;display:none}
+.login .hint{margin-top:22px;font-size:12px;color:var(--muted)}
+/* ---- dashboard ---- */
+#admin-view{display:none}
+.adm{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+.side{background:#fff;border-right:1px solid var(--line);padding:34px 0;position:sticky;top:0;height:100vh}
+.side .lg{display:flex;align-items:center;gap:11px;padding:0 26px 28px;border-bottom:1px solid var(--line)}
+.side .lg img{height:30px}
+.side .lg b{font-size:13.5px;letter-spacing:.12em}
+.side nav{padding:18px 0}
+.side nav a{display:block;padding:13px 28px;font-size:14px;font-weight:500;color:var(--ink-2);border-left:3px solid transparent;cursor:pointer}
+.side nav a.on,.side nav a:hover{color:var(--accent-deep);background:var(--accent-soft);border-left-color:var(--accent)}
+.side .out{position:absolute;bottom:26px;left:28px;font-size:12.5px;color:var(--muted);cursor:pointer}
+.main{padding:44px 48px}
+.main h1{font-size:22px;font-weight:700;margin-bottom:6px}
+.main .desc{font-size:13px;color:var(--muted);margin-bottom:32px}
+.panel{background:#fff;border:1px solid var(--line);border-radius:18px;padding:32px;margin-bottom:26px;display:none}
+.panel.show{display:block}
+.panel h2{font-size:16px;font-weight:700;margin-bottom:20px;display:flex;align-items:center;gap:10px}
+.panel h2::before{content:"";width:8px;height:8px;border-radius:50% 0 50% 50%;background:var(--accent)}
+.row2{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:16px}
+.switch{position:relative;width:52px;height:28px}
+.switch input{opacity:0;width:0;height:0}
+.switch i{position:absolute;inset:0;background:var(--sand-3);border-radius:999px;transition:.3s;cursor:pointer}
+.switch i::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:.3s;box-shadow:0 2px 6px rgba(0,0,0,.15)}
+.switch input:checked+i{background:var(--accent)}
+.switch input:checked+i::after{left:27px}
+.thumbs{display:flex;gap:14px;flex-wrap:wrap}
+.thumbs label{display:block;width:140px;border:2px solid var(--line);border-radius:12px;overflow:hidden;cursor:pointer;position:relative}
+.thumbs input{position:absolute;opacity:0}
+.thumbs label.sel{border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,163,163,.3)}
+.thumbs img{width:100%}
+.fld{margin-bottom:14px}
+.fld label{display:block;font-size:13px;font-weight:600;margin-bottom:7px;color:var(--ink-2)}
+.fld input,.fld textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px 15px;font-family:var(--sans);font-size:14px}
+.fld input:focus,.fld textarea:focus{outline:0;border-color:var(--accent);background:#fff}
+.nlist{border-top:1px solid var(--line-2)}
+.nrow{display:flex;align-items:center;gap:16px;padding:14px 6px;border-bottom:1px solid var(--line);font-size:14px}
+.nrow .t{flex:1;font-weight:500}
+.nrow .d{font-size:12px;color:var(--muted)}
+.nrow button{background:none;border:1px solid var(--line-2);border-radius:999px;padding:5px 14px;font-family:var(--sans);font-size:12px;color:#B4666B;cursor:pointer}
+.nrow button:hover{background:#B4666B;border-color:#B4666B;color:#fff}
+.save{margin-top:8px}
+.toast{position:fixed;right:28px;bottom:28px;background:var(--ink);color:#fff;border-radius:999px;padding:13px 26px;font-size:13.5px;opacity:0;transition:.4s;pointer-events:none}
+.toast.show{opacity:1}
+.note{font-size:12px;color:var(--muted);margin-top:12px;line-height:1.7}
+@media(max-width:900px){.adm{grid-template-columns:1fr}.side{position:static;height:auto}.main{padding:28px 20px}}
+</style></head><body>
+
+<div id="login-view">
+<form class="login" id="lf">
+  <img src="img/logo_flower_rose.png" alt="">
+  <h1>MEDICAL BLOOM</h1><div class="sub">Admin Console</div>
+  <input type="text" id="uid" placeholder="아이디" autocomplete="username">
+  <input type="password" id="upw" placeholder="비밀번호" autocomplete="current-password">
+  <button class="btn solid" type="submit">로그인</button>
+  <div class="err" id="err">아이디 또는 비밀번호가 올바르지 않습니다.</div>
+  <div class="hint">데모 계정 — ID: admin / PW: bloom2026</div>
+</form>
+</div>
+
+<div id="admin-view"><div class="adm">
+<aside class="side">
+  <div class="lg"><img src="img/logo_flower_rose.png" alt=""><b>BLOOM ADMIN</b></div>
+  <nav>
+    <a data-p="popup" class="on">이벤트 팝업 관리</a>
+    <a data-p="promo">프로모션 배너</a>
+    <a data-p="notice">공지사항 관리</a>
+    <a data-p="site">사이트 바로가기</a>
+  </nav>
+  <span class="out" id="logout">로그아웃 →</span>
+</aside>
+<main class="main">
+  <h1 id="ptitle">이벤트 팝업 관리</h1>
+  <div class="desc">변경 사항은 이 브라우저에서 열리는 사이트에 즉시 반영됩니다. (localStorage 기반 로컬 데모)</div>
+
+  <section class="panel show" id="p-popup">
+    <h2>메인 이벤트 팝업</h2>
+    <div class="row2"><span style="font-size:14px;font-weight:600">팝업 노출</span>
+      <label class="switch"><input type="checkbox" id="pp-on"><i></i></label></div>
+    <div class="fld"><label>팝업 이미지 선택</label><div class="thumbs" id="pp-thumbs"></div></div>
+    <div class="fld"><label>클릭 시 이동 링크</label><input type="text" id="pp-link" placeholder="https:// 또는 pages/promotion.html"></div>
+    <button class="btn solid save" id="pp-save">저장</button>
+    <div class="note">'오늘 하루 보지 않기'를 누른 브라우저에서는 24시간 동안 팝업이 다시 뜨지 않습니다.</div>
+  </section>
+
+  <section class="panel" id="p-promo">
+    <h2>프로모션 가격표 배너</h2>
+    <div class="fld"><label>노출할 배너 선택 (프로모션 페이지·메인에 적용)</label><div class="thumbs" id="pm-thumbs"></div></div>
+    <button class="btn solid save" id="pm-save">저장</button>
+    <div class="note">기본 3종의 가격표 이미지 중 노출 여부를 선택합니다. 새 이미지는 assets 폴더에 추가 후 코드 반영이 필요합니다.</div>
+  </section>
+
+  <section class="panel" id="p-notice">
+    <h2>공지사항 등록</h2>
+    <div class="fld"><label>제목</label><input type="text" id="nt-title"></div>
+    <div class="row2" style="gap:14px">
+      <div class="fld" style="flex:1"><label>날짜</label><input type="text" id="nt-date" placeholder="2026-07-03"></div>
+      <div class="fld" style="flex:1"><label>작성자</label><input type="text" id="nt-author" value="관리자"></div>
+    </div>
+    <div class="fld"><label>내용</label><textarea id="nt-body" rows="4"></textarea></div>
+    <button class="btn solid save" id="nt-add">공지 등록</button>
+    <h2 style="margin-top:34px">등록된 공지</h2>
+    <div class="nlist" id="nt-list"></div>
+    <div class="note">기본 공지(26년 2월 진료 일정)는 사이트에 내장되어 있어 삭제할 수 없습니다. 여기서 등록한 공지는 공지사항 목록 상단에 추가됩니다.</div>
+  </section>
+
+  <section class="panel" id="p-site">
+    <h2>사이트 바로가기</h2>
+    <div class="row2">
+      <a class="btn" href="index.html" target="_blank">한국어 사이트</a>
+      <a class="btn" href="en/index.html" target="_blank">English</a>
+      <a class="btn" href="jp/index.html" target="_blank">日本語</a>
+      <a class="btn" href="cn/index.html" target="_blank">中文</a></div>
+    <div class="row2" style="margin-top:8px">
+      <a class="btn" href="https://naver.me/FFaXuTtv" target="_blank">네이버 예약</a>
+      <a class="btn" href="https://pf.kakao.com/_uSZxfd" target="_blank">카카오톡 채널</a></div>
+  </section>
+</main></div></div>
+<div class="toast" id="toast">저장되었습니다</div>
+
+<script>
+var loginV=document.getElementById('login-view'), adminV=document.getElementById('admin-view');
+function render(){ var on=sessionStorage.getItem('mb_admin')==='1';
+  loginV.style.display=on?'none':'flex'; adminV.style.display=on?'block':'none'; }
+render();
+document.getElementById('lf').addEventListener('submit',function(e){
+  e.preventDefault();
+  var u=document.getElementById('uid').value.trim(), p=document.getElementById('upw').value;
+  if(u==='admin'&&p==='bloom2026'){ sessionStorage.setItem('mb_admin','1'); render(); }
+  else{ document.getElementById('err').style.display='block'; }
+});
+document.getElementById('logout').addEventListener('click',function(){ sessionStorage.removeItem('mb_admin'); render(); });
+
+var IMGS=['assets/20260128_c45a26960de62.png','assets/20260128_004a67120488d.png','assets/20260128_4e97201a375c4.png'];
+var names={popup:'이벤트 팝업 관리',promo:'프로모션 배너',notice:'공지사항 관리',site:'사이트 바로가기'};
+document.querySelectorAll('.side nav a').forEach(function(a){
+  a.addEventListener('click',function(){
+    document.querySelectorAll('.side nav a').forEach(function(x){x.classList.remove('on')}); a.classList.add('on');
+    document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('show')});
+    document.getElementById('p-'+a.dataset.p).classList.add('show');
+    document.getElementById('ptitle').textContent=names[a.dataset.p];
+  });
+});
+function toast(m){ var t=document.getElementById('toast'); t.textContent=m||'저장되었습니다'; t.classList.add('show'); setTimeout(function(){t.classList.remove('show')},1800); }
+function get(k,d){ try{var v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d} }
+function set(k,v){ localStorage.setItem(k,JSON.stringify(v)); }
+/* popup */
+var pc=get('mb_popup',{enabled:true,img:IMGS[0],link:null});
+document.getElementById('pp-on').checked=pc.enabled!==false;
+document.getElementById('pp-link').value=pc.link||'';
+var tb=document.getElementById('pp-thumbs');
+IMGS.forEach(function(src,i){
+  var l=document.createElement('label'); l.innerHTML='<input type="radio" name="ppimg"><img src="'+src+'">';
+  if((pc.img||IMGS[0]).indexOf(src.split('/').pop())>-1) l.classList.add('sel');
+  l.addEventListener('click',function(){ tb.querySelectorAll('label').forEach(function(x){x.classList.remove('sel')}); l.classList.add('sel'); });
+  tb.appendChild(l);
+});
+document.getElementById('pp-save').addEventListener('click',function(){
+  var sel=[].indexOf.call(tb.children, tb.querySelector('label.sel'));
+  set('mb_popup',{enabled:document.getElementById('pp-on').checked,
+    img:IMGS[sel<0?0:sel], link:document.getElementById('pp-link').value||null});
+  localStorage.removeItem('mb_popup_hide');
+  toast();
+});
+/* promo banners */
+var pm=get('mb_promos',[0,1,2]);
+var pt=document.getElementById('pm-thumbs');
+IMGS.forEach(function(src,i){
+  var l=document.createElement('label'); l.innerHTML='<input type="checkbox"><img src="'+src+'">';
+  if(pm.indexOf(i)>-1) l.classList.add('sel');
+  l.addEventListener('click',function(){ l.classList.toggle('sel'); });
+  pt.appendChild(l);
+});
+document.getElementById('pm-save').addEventListener('click',function(){
+  var out=[]; [].forEach.call(pt.children,function(l,i){ if(l.classList.contains('sel')) out.push(i); });
+  set('mb_promos',out); toast();
+});
+/* notices */
+function renderN(){
+  var list=get('mb_notices',[]); var el=document.getElementById('nt-list'); el.innerHTML='';
+  if(!list.length){ el.innerHTML='<div class="nrow" style="color:var(--muted)">등록된 공지가 없습니다.</div>'; return; }
+  list.forEach(function(n,i){
+    var r=document.createElement('div'); r.className='nrow';
+    r.innerHTML='<span class="t"></span><span class="d"></span><button>삭제</button>';
+    r.querySelector('.t').textContent=n.title; r.querySelector('.d').textContent=(n.date||'')+' · '+(n.author||'관리자');
+    r.querySelector('button').addEventListener('click',function(){
+      if(!confirm('이 공지를 삭제할까요?\n\n'+n.title)) return;
+      var l=get('mb_notices',[]); l.splice(i,1); set('mb_notices',l); renderN(); toast('삭제되었습니다');
+    });
+    el.appendChild(r);
+  });
+}
+renderN();
+document.getElementById('nt-date').value=new Date().toISOString().slice(0,10);
+document.getElementById('nt-add').addEventListener('click',function(){
+  var t=document.getElementById('nt-title').value.trim(); if(!t){ alert('제목을 입력해주세요.'); return; }
+  var l=get('mb_notices',[]);
+  l.push({title:t,date:document.getElementById('nt-date').value,author:document.getElementById('nt-author').value,content:document.getElementById('nt-body').value});
+  set('mb_notices',l); document.getElementById('nt-title').value=''; document.getElementById('nt-body').value='';
+  renderN(); toast('공지가 등록되었습니다');
+});
+</script></body></html>
